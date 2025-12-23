@@ -4,10 +4,17 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -34,20 +41,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/.vitepress/dist
           force_orphan: true
-
-      - name: Deploy to Gitee
-        uses: wearerequired/git-mirror-action@master
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_SSH_KEY }}
-        with:
-          source-repo: git@github.com:ii3lack/design-patterns-go.git
-          destination-repo: git@gitee.com:i3lack/design-patterns-go.git
-
-      - name: Deploy Gitee Pages
-        uses: yanglbme/gitee-pages-action@main
-        with:
-          gitee-username: i3lack
-          gitee-password: ${{ secrets.GITEE_PASSWORD }}
-          gitee-repo: i3lack/design-patterns-go
-          branch: gh-pages
-          directory: docs/.vitepress/dist
