@@ -4,61 +4,29 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pages: write
-      id-token: write
-
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'pnpm'
-          cache-dependency-path: '**/pnpm-lock.yaml'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-          run_install: false
+      - name: Install pnpm
+        run: npm install -g pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Build docs
-        run: |
-          echo "Building documentation..."
-          pnpm run docs:build
-          echo "Build completed. Verifying output directory..."
-          ls -la docs/.vitepress/dist
-
-      - name: Check build output
-        run: |
-          if [ ! -d "docs/.vitepress/dist" ]; then
-            echo "❌ Error: Build directory not found!"
-            echo "Current directory structure:"
-            find . -maxdepth 3 -type d
-            exit 1
-          fi
-          echo "✅ Build directory exists"
-          echo "Total files in build directory:"
-          find docs/.vitepress/dist -type f | wc -l
-          echo "Key files:"
-          ls -la docs/.vitepress/dist/index.html docs/.vitepress/dist/assets/
+        run: pnpm run docs:build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -66,4 +34,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/.vitepress/dist
           force_orphan: true
-          verbose: true
