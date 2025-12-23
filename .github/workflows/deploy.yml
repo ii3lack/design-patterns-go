@@ -28,13 +28,13 @@ jobs:
         with:
           node-version: 18
           cache: 'pnpm'
-          cache-dependency-path: 'pnpm-lock.yaml'  # 确保缓存基于 lock 文件
+          cache-dependency-path: '**/pnpm-lock.yaml'
 
-      - name: Install pnpm
-        run: npm install -g pnpm@8.15.6  # 安装特定版本避免兼容性问题
-
-      - name: Verify pnpm installation
-        run: pnpm --version
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -57,6 +57,8 @@ jobs:
           echo "✅ Build directory exists"
           echo "Total files in build directory:"
           find docs/.vitepress/dist -type f | wc -l
+          echo "Key files:"
+          ls -la docs/.vitepress/dist/index.html docs/.vitepress/dist/assets/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
