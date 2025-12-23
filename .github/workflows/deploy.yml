@@ -27,23 +27,24 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'pnpm'  # 启用 pnpm 缓存
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'  # 确保缓存基于 lock 文件
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 8
-          run_install: false
+      - name: Install pnpm
+        run: npm install -g pnpm@8.15.6  # 安装特定版本避免兼容性问题
+
+      - name: Verify pnpm installation
+        run: pnpm --version
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build docs
         run: |
           echo "Building documentation..."
           pnpm run docs:build
           echo "Build completed. Verifying output directory..."
-          ls -la docs/.vitepress/dist || echo "Build directory not found"
+          ls -la docs/.vitepress/dist
 
       - name: Check build output
         run: |
@@ -54,8 +55,8 @@ jobs:
             exit 1
           fi
           echo "✅ Build directory exists"
-          echo "Contents:"
-          ls -la docs/.vitepress/dist/
+          echo "Total files in build directory:"
+          find docs/.vitepress/dist -type f | wc -l
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
