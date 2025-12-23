@@ -56,7 +56,7 @@ export default defineConfig({
             }
         ],
         socialLinks: [
-            {icon: 'github', link: 'https://github.com/yourusername/design-patterns-go'}
+            {icon: 'github', link: 'https://github.com/ii3lack/design-patterns-go.git'}
         ],
         footer: {
             message: '基于MIT许可发布',
